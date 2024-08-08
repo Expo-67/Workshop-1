@@ -1,88 +1,76 @@
-// Accessing the balance element
-const newAmount = document.getElementById("balance");
+const balance = document.getElementById("balance");
+const amounts = [];
+const deposits = [];
+const withdrawals = [];
+let Balance = 0;
+const amount = document.getElementById("amount");
+const depositBtn = document.getElementById("depositBtn");
+const withdrawBtn = document.getElementById("withdrawBtn");
 
-// Initial balance to number
-let balance = 0;
+// Create our number formatter.
+const formatter = new Intl.NumberFormat("KES", {
+  style: "currency",
+  currency: "KES",
+  minimumFractionDigits: 2,
+});
 
-// Adding references to buttons
-const depositButton = document.getElementById("depositBtn");
-const withdrawButton = document.getElementById("withdrawBtn");
+// accept deposits from user, store deposits in array
+depositBtn.addEventListener("click", () => {
+  // checks if deposit is a number
+  if (isNaN(amount.value)) {
+    alert("Please enter a number.");
+    return (amount.value = "");
+  } else {
+    // checks if deposit meets parameters
+    if (amount.value < 129.01 || amount.value > 100000) {
+      alert("You can only deposit between ksh129.01 and ksh100,000.");
+      return (amount.value = "");
+    } else {
+      // push deposit to array
+      deposits.push(Number(amount.value));
+      // calculate Total Balance
+      Balance += Number(amount.value);
 
-// Adding event listeners to the buttons
-depositButton.addEventListener("click", depositMoney);
-withdrawButton.addEventListener("click", withdrawMoney);
+      //  TotalBalance to show  (2 decimal places)
+      let totalBalanceFormatted = formatter.format(Balance);
+      document.getElementById("balance").innerHTML = totalBalanceFormatted;
 
-// Writing a function to get the input number
-function getInputNumber() {
-  const input = document.getElementById("amount").value;
-  return parseFloat(input);
-}
-
-// Function for depositing money to handle the deposit action
-function depositMoney() {
-  const depositAmount = getInputNumber();
-  if (isNaN(depositAmount) || depositAmount <= 0) {
-    console.error("Invalid deposit amount");
-    return;
+      // print deposit to console to verify success
+      console.log(amount.value);
+      return (amount.value = "");
+    }
   }
-  balance += depositAmount; // Updating the balance
-  console.log(`New Balance: ${balance}`);
-  newAmount.textContent = `${balance.toFixed(2)}`;
+});
 
-  // Creating and adding the transaction entry
-  const transaction = createTransactionEntry("Deposit", depositAmount);
-  updateTransactionTable(transaction);
-}
+// accept withdrawals from user, store withdrawals in array
+withdrawBtn.addEventListener("click", () => {
+  // checks if withdrawal is a number
+  if (isNaN(amount.value)) {
+    alert("Please enter a number.");
+    return (amount.value = "");
+  } else {
+    // checks if withdrawal meets parameters
+    if (amount.value > Balance - 100) {
+      alert("Your total balance cannot drop below ksh100.");
+      return (amount.value = "");
+    } else {
+      // push withdrawal to array
+      withdrawals.push(Number(amount.value));
+      // calculate Total Balance
+      Balance -= Number(amount.value);
 
-// Function to withdraw money to handle the withdraw action
-function withdrawMoney() {
-  const withdrawAmount = getInputNumber();
-  if (isNaN(withdrawAmount) || withdrawAmount <= 0) {
-    console.error("Invalid withdrawal amount");
-    return;
+      // format TotalBalance to show  (2 decimal places)
+      let totalBalanceFormatted = formatter.format(Balance);
+      document.getElementById("balance").innerHTML = totalBalanceFormatted;
+
+      // print withdrawal to console to verfify success
+      console.log("ksh" + amount.value);
+      return (amount.value = "");
+    }
   }
-  if (withdrawAmount > balance) {
-    console.error("Insufficient balance");
-    return;
-  }
-  balance -= withdrawAmount; // Updating the balance
-  console.log(`New Balance: ${balance}`);
-  newAmount.textContent = `${balance.toFixed(2)}`;
+});
 
-  // Creating and adding the transaction entry
-  const transaction = createTransactionEntry("Withdraw", withdrawAmount);
-  updateTransactionTable(transaction);
-}
+// format TotalBalance to show  (2 decimal places)
 
-// Function for validating the input
-function validateInput(depositAmount, withdrawAmount) {
-  if (isNaN(depositAmount) || depositAmount > 10000000) {
-    console.error("Invalid deposit amount");
-    return;
-  }
-  if (isNaN(withdrawAmount) || withdrawAmount < 20) {
-    console.error("Invalid withdrawal amount");
-    return false;
-  }
-  return true;
-}
-
-// Function for creating the transaction entry
-function createTransactionEntry(type, amount) {
-  const date =
-    new Date().toLocaleString(); /*new Date()=>creates a new Date object that represents the current date and time*/
-  /*toLocaleString => converts the Date object into a string that represents the date and time*/
-  return { type, amount, date };
-}
-
-// Function for updating the transaction table
-function updateTransactionTable(transaction) {
-  const tableBody = document.getElementById("transactionTable");
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td class="px-4 py-2 border">${transaction.type}</td>
-    <td class="px-4 py-2 border">${transaction.amount.toFixed(2)}</td>
-    <td class="px-4 py-2 border">${transaction.date}</td>
-  `;
-  tableBody.appendChild(row);
-}
+let totalBalanceFormatted = formatter.format(Balance);
+document.getElementById("balance").innerHTML = totalBalanceFormatted;
